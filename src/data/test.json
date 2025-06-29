@@ -1,0 +1,16 @@
+[
+    {
+        "issuer": "Shiv Rishi Marketing & Services Pvt Ltd",
+        "order_number": "SRMS/PO/25-26/30",
+        "date": "2025-05-17",
+        "delivery_date": "null",
+        "payment_terms": "100% Against PI",
+        "bill_to": "203, Krishna Apartments, MIG-192,, Road No.1, KPHB Colony,\r\nKukatpally, Hyderabad, Telangana - 500072\r",
+        "ship_to": "203, Krishna Apartments, MIG-192,, Road No.1, KPHB Colony,\r\nKukatpally, Hyderabad, Telangana - 500072\r",
+        "gst_code": 36,
+        "tax_amount": 2618.1,
+        "total_amount": 17163.1,
+        "currency": "INR",
+        "desc": "Invoice from Shiv Rishi Marketing & Services Pvt Ltd"
+    }
+]

@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+issuer: Ultra Drytech Engineering Projects Pvt Ltd
+keywords:
+  - PURCHASE ORDER
+  - Ultra Drytech Engineering
+required_fields:
+  - date
+  - order_number
+fields: 
+  order_number:
+    parser: regex
+    area: {f: 1, l: 1, x: 612, y: 67, r: 144, W: 522, H: 595}
+    regex: 
+      - Voucher.*Dated\s+(\S+)\s+
+  date:
+    parser: regex
+    area: {f: 1, l: 1, x: 612, y: 67, r: 144, W: 522, H: 595}
+    regex:
+      - (\d{1,2}\-\w{3}\-\d{2})
+    type: date
+    group: min
+  delivery_date:
+    parser: regex
+    area: {f: 1, l: 1, x: 610, y: 276, r: 144, W: 522, H: 391}
+    regex:
+      - (\d{2}\W\d{2}\W\d{4})
+    type: date
+    group: min
+  payment_terms:
+    parser: static
+    value: "100% Against PI"
+  bill_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 65, y: 67, r: 144, W: 550, H: 583}
+    regex:
+      - Invoice To\s+([\s\S]*?)\s+GSTIN\/UIN
+  ship_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 106, y: 245, r: 144, W: 508, H: 215}
+    regex:
+      - Consignee\s+\(Ship\s+to\)\s*\n*([\s\S]*?)\s*GSTIN\/UIN
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount:
+    parser: static
+    value: 0
+    type: float
+  total_amount:
+    parser: regex
+    regex: 
+      - Nos\s+Rs.\s+([0-9,]+\.\d{2})
+    type: float
+  lines:
+    parser: lines
+    start: per\s+Amount\s+No.
+    end: 'Total\s+'
+    first_line: 
+      - (?P<line_no>\d{1,2})\s+(?P<description>.+?)\s+(?P<due_on>\d{2}-\w{3}-\d{2})\s+(?P<quantity>\d+\.?\d*)\s+[a-zA-Z]+\s+(?P<rate>[0-9,]+\.\d{2})\s+[a-zA-Z]+\s+(?P<discount>)(?P<value>[0-9,]+\.\d{2})
+    line: 
+      - '\s+(?P<description>.+)$'
+    types:
+      line_no: int
+      due_on: date
+      quantity: int
+      rate: float
+      discount: float
+      value: float
+options:
+  currency: INR
+  date_formats: 
+    - '%d/%b/%y'
+  languages: 
+    - en

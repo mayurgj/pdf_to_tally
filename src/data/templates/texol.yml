@@ -1,0 +1,73 @@
+# -*- coding: utf-8 -*-
+issuer: TEXOL ENGINEERING PVT LTD
+keywords:
+  - Texol
+  - Texol Engineering
+required_fields:
+  - order_number
+fields:
+  order_number:
+    parser: regex
+    regex:
+      - DELIVERY\s+DATE\s+(\S+)\s+
+  date:
+    parser: regex
+    regex:
+      - (\d{2}\/\d{2}\/\d{4})
+    type: date
+    group: min
+  delivery_date:
+    parser: regex
+    regex:
+      - (\d{2}\/\d{2}\/\d{4})
+    type: date
+    group: max
+  payment_terms:
+    parser: static
+    value: "30 Days"
+  bill_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 37, y: 40, r: 144, W: 367, H: 157}
+    regex:
+      - Limited\s+([\s\S]*)\s+CIN
+  ship_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 37, y: 40, r: 144, W: 367, H: 157}
+    regex:
+      - Limited\s+([\s\S]*)\s+CIN
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount:
+    parser: regex
+    regex:
+      - GST\s+Tax\s+Amount\s+([0-9,]+\.\d+)
+    type: float
+    group: sum
+  total_amount:
+    parser: regex
+    regex:
+      -  ([0-9,]+\.\d+)
+    type: float
+    group: max  
+  lines: 
+    parser: lines
+    start: ITEM\s+DESCRIPTION\s+INR(?:\s+INR)+\s+
+    end: \s+Subs\+total\s+INR
+    first_line: 
+      - (?P<line_no>^\d{1,2})\s+\W+(?P<description>.+?)\s+\S+\s+(?P<due_on>)\s+(?P<quantity>\d{1,2}\.\d{2,4})\s+\W+\Nos\W\s+\S+\s+(?P<rate>[0-9,]+\.\d{2})[\S\s].+(?P<discount>)\s+(?P<value>[0-9,]+\.\d{2})
+    line: 
+      - '\s+(?P<description>.+)$'
+    types:
+      line_no: int
+      quantity: int
+      rate: float
+      value: float
+options:
+  currency: INR
+  date_formats:
+    - '%d/%m/%Y'
+  languages:
+    - en
+

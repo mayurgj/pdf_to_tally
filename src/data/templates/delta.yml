@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+issuer: Delta Sales and Services 
+keywords:
+  - PURCHASE ORDER
+  - Delta Sales
+  - 27EFNPS7662A1Z0
+required_fields:
+  - order_number
+  - date
+fields: 
+  order_number:
+    parser: regex
+    area: {f: 1, l: 1, x: 775, y: 75, r: 144, W: 422, H: 289}
+    regex: 
+      - Voucher\s+No\s*.\s*Dated\s+([^\s]+)
+  date:
+    parser: regex
+    area: {f: 1, l: 1, x: 775, y: 75, r: 144, W: 422, H: 289}
+    regex:
+      - (\d{1,2}-\w{3}-\d{2})
+    group: min
+    type: date
+  delivery_date:
+    parser: static
+    value: "null"
+  payment_terms:
+    parser: regex
+    area: {f: 1, l: 1, x: 775, y: 75, r: 144, W: 422, H: 289}
+    regex:
+      - Mode\/Terms\s+of\s+Payment\s+([\s\S]*)\s\nReference
+  bill_to:
+    parser: regex
+    area: {f: 1, l: 1, x: 46, y: 72, r: 144, W: 689, H: 360}
+    regex:
+      - 'Invoice\s+To\s+Delta\s+Sales\s+and\s+Services\s*-\s+-\s*\(from\s+\S+\)\s+([\s\S]*?)\s+GSTIN\/UIN:' 
+  ship_to:
+    parser: regex
+    area: {f: 1, l: 1, x: 46, y: 72, r: 144, W: 689, H: 360}
+    regex:
+       - 'Consignee\s+\(Ship\s+to\)\s+Delta\s+Sales\s+and\s+Services\s*-\s*-\s*\(from\s+\S+\)\s+([\s\S]*?)\s+e-mail'
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount:
+    parser: regex
+    regex:
+      - CGST\s+([0-9,]+\.\d{2})\s+
+      - SGST\s+([0-9,]+\.\d{2})\s+
+    group: sum
+    type: float
+  total_amount:
+    parser: regex
+    regex:
+      - \s+([0-9,]+\.\d{2})\s+
+    group: max
+    type: float
+  lines:
+    parser: lines
+    start: Amount\s+No.
+    end: CGST
+    first_line: 
+      - (?P<line_no>^\d{1,2})\s+(?P<description>.+?)\s+(?P<due_on>\d{1,2}-\w+-\d{2})\s+(?P<quantity>[0-9,]+\.\d{2})\s+NOS\s+(?P<rate>[0-9,]+\.\d{2})\s+\w+(?P<discount>)\s+(?P<value>[0-9,]+\.\d{2})\s+
+    line: 
+      - '\s+(?P<description>.+)$'
+    types:
+      line_no: int
+      due_on: date
+      quantity: int
+      rate: float
+      discount: float
+      value: float
+options:
+  currency: INR
+  date_formats: 
+    - '%d/%b/%y'
+  languages: 
+    - en

@@ -1,0 +1,76 @@
+# -*- coding: utf-8 -*-
+issuer: CESARE BONETTI INTERNATIONAL PVT LTD
+keywords:
+  - 27AAHCC1670N1ZC
+  - CESARE BONETTI
+  - Receipt Date
+required_fields:
+  - order_number
+  - date
+fields: 
+  order_number: 
+    parser: regex
+    regex: 
+      - Purchase\s+Order\s*:\s+(DO\d+)\s+
+  date:
+    parser: regex
+    regex: 
+      - PO\s+Date\s+(\d{2}\/\d{2}\/\d{4})
+    type: date
+  delivery_date:
+    parser: regex
+    regex:
+      - \s+Delivery\s+date\s+(\d{2}\/\d{2}\/\d{4})
+    type: date
+  payment_terms:
+    parser: static
+    value: "100% Against PI"
+  bill_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 38, y: 52, r: 144, W: 322, H: 419}
+    regex:
+      - Name\s+and\s+Address\s+of\s+Buyer\s+CESARE\s+BONETTI\s+INTERNATIONAL\s+PVT\s+LT\s+([\s\S]*)\s+Prepared\s+By
+  ship_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 685, y: 74, r: 144, W: 470, H: 316}
+    regex:
+      - Shipping\s+Details\s+CESARE\s+BONETTI\s+INTERNATIONAL\s+PVT\s+LT\s+([\s\S]*)\s+GSTIN
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount:
+    parser: regex
+    regex: 
+      - CGST\s+SGST\s+IGST\s+TCS\s+([0-9,]+\.\d{2})\s+
+      - CGST\s+SGST\s+IGST\s+TCS\s+[0-9,]+\.\d{2}\s+([0-9,]+\.\d{2})\s+
+    group: sum
+    type: float
+  total_amount:
+    parser: regex
+    regex: 
+      - Grand Total\s+\D+([0-9,]+\.\d{2})
+    type: float
+  lines: 
+    parser: lines
+    start: Rate\s+Amount\s+Amount\s+Amount\s+INR\s+
+    end: '\s+Amount\s+in\s+Words:'
+    first_line: 
+      - (?P<line_no>^\d{1,2})\s+(?P<description>.+?)\s+(?P<due_on>\d{1,2}-\d{1,2}-\d{2,4})\s+(?P<quantity>\d{1,2}\.\d{2,4})\s+Nos\s+(?P<rate>[0-9,]+\.\d{2})\s+\w+\s+(?P<discount>\d{1,2}\.\d{2,4})\s+(?P<value>[0-9,]+\.\d{2})\s+
+    last_line: 
+      - SO\s+no.\/line:\s+(?P<description>\S+)\s+
+    line: 
+      - '\s+(?P<description>.+)$'
+    types:
+      line_no: int
+      due_on: date
+      quantity: int
+      rate: float
+      discount: float
+      value: float
+options:
+  currency: INR
+  date_formats:
+    - '%d/%m/%Y'
+  languages:
+    - en

@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+issuer: MASCOT DYNAMICS PVT LTD
+keywords:
+  - PURCHASE ORDER
+  - MASCOT DYNAMICS
+required_fields:
+  - date
+  - order_number
+fields: 
+  order_number: 
+    parser: regex
+    regex: 
+      - P.O.\s+No.\s+:\s+(\S+)\s+
+  date:
+    parser: regex
+    regex: 
+      - P.O.\s+Date\s+:\s+(\d{2}\s+\w+\s+\d{4})
+    type: date
+  delivery_date:
+    parser: static
+    value: "null"
+  payment_terms:
+    parser: regex
+    regex:
+      - Payment\s+Term\s+:\s*([\s\S]*?)\s+Taxes
+  bill_to:
+    parser: regex
+    area: {f: 1, l: 1, x: 614, y: 483, r: 144, W: 530, H: 161}
+    regex:
+      - Bill\s+To\s*:\s+Mascot\s+Dynamics\s+Private\s+Limited\s+([\s\S]*\d{6})\s+
+  ship_to:
+    parser: regex
+    area: {f: 1, l: 1, x: 25, y: 485, r: 144, W: 480, H: 159}
+    regex:
+      - Ship\s+To\s*:\s+Mascot\s+Dynamics\s+Private\s+Limited\s+([\s\S]*\d{6})\s+
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount:
+    parser: regex
+    regex: 
+      - Total\s*CGST\s*[0-9]+.\d+\s*%\s*([0-9,]+\.\d{2})
+      - Total\s*SGST\s*[0-9]+.\d+\s*%\s*([0-9,]+\.\d{2})
+    type: float
+    group: sum
+  total_amount:
+    parser: regex
+    regex: 
+      - Grand Total\s+\D+([0-9,]+\.\d{2})
+    type: float
+  lines:
+    parser: lines
+    start: No\s+Amount\s+
+    end: '\s+Terms\s+&\s+Conditions\s+:'
+    first_line: (?P<line_no>^\d{1,2})\s+(?P<description>.+)\s+\d{4,8}(?P<due_on>)\s+(?P<quantity>\d{1,2})\s+NOS\s+(?P<rate>[0-9,]+\.\d{2})(?P<discount>)\s+(?P<value>[0-9]{2,}\.\d{2})
+    line: 
+      - (?P<description>[\s\S]*)
+    types:
+      line_no: int
+      due_on: date
+      quantity: int
+      rate: float
+      discount: float
+      value: float
+options:
+  currency: INR
+  date_formats: 
+    - '%d/%b/%y'
+  languages: 
+    - en

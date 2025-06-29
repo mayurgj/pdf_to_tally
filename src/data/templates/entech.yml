@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+issuer: Entech Controls
+keywords:
+  - Purchase Order
+  - Entech
+  - 27AAGPM0540D1Z6
+required_fields:
+  - order_number
+  - date
+fields: 
+  order_number: 
+    parser: regex
+    regex: 
+      - PO Number\s+(PO\/\d+-\d+\/\d{5})
+  date: 
+    parser: regex
+    regex: 
+      - PO Date\s+(\d{2}\/\d{2}\/\d{4})
+    type: date
+  delivery_date: 
+    parser: regex
+    regex: 
+      - Delivery Date\s+(\d+\/\d+\/\d+)
+    type: date
+  payment_terms: 
+    parser: regex
+    regex:
+      - Payment\sTerms\W+\n\s+(.+).
+  bill_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 93, y: 276, r: 144, W: 317, H: 185}
+    regex:
+      - Entech\s+Controls\s+([\s\S]*)\s+Contact\s+Person
+  ship_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 786, y: 276, r: 144, W: 249, H: 101}
+    regex:
+      - Entech\s+Controls\s+-\s+Nashik\s+([\s\S]*)\s+GSTIN
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount: 
+    parser: regex
+    regex: 
+      - Total\s+Tax\s+\W+\s+\W+([0-9,]+\.\d{2})
+    type: float
+  total_amount:
+    parser: regex
+    regex: 
+      - Grand Total\s+\D+([0-9,]+\.\d{2})
+    type: float
+  lines: 
+    parser: lines
+    start: Rate\s+Amount\s+Rate\s+Amount\s+
+    end: \s+Total
+    first_line: 
+      - (?P<line_no>^\d{1,2})\s+(?P<description>.+?)\s+(?P<due_on>)(?P<quantity>\d{1,}\.\d+)\s*NOS\W+(?P<rate>[0-9,]+\.\d{2})(?P<discount>)\s+\W+(?P<value>[0-9,]+\.\d{2})
+    last_line: 
+      - \s+Item\s+ID:\s+(?P<description>.+)
+    line: \s+(?P<description>.+)$
+    types:
+      line_no: int
+      due_on: date
+      quantity: int
+      rate: float
+      discount: float
+      value: float
+options:
+  currency: INR
+  date_formats:
+    - '%d/%m/%Y'
+  languages:
+    - en

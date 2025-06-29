@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+issuer: Georg Fischer Piping Systems Pvt Ltd
+keywords:
+  - Purchase Order
+  - Georg Fischer Piping
+required_fields:
+  - order_number
+  - date
+fields: 
+  order_number:
+    parser: regex
+    regex: 
+      - Purchase\s+Order\s+(IN1\s+\/\s+\d{8}\s+\/\s+\d{4})
+  date:
+    parser: regex
+    regex:
+      - (\d{2}.\d{2}.\d{4})
+    group: min
+    type: date
+  delivery_date:
+    parser: static
+    value: ' '
+  payment_terms:
+    parser: regex
+    regex:
+      - Terms\s+of\s+payment\s+([\s\S]*)\s+\n\s+Freight
+  bill_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 78, y: 46, r: 144, W: 476, H: 122}
+    regex:
+      - 'Georg\s+Fischer\s+Piping\s+Systems\s+Pvt\s+Ltd\s+([\s\S]*)\s+GSTN'
+  ship_to: 
+    parser: regex
+    area: {f: 1, l: 1, x: 78, y: 46, r: 144, W: 476, H: 122}
+    regex:
+      - 'Georg\s+Fischer\s+Piping\s+Systems\s+Pvt\s+Ltd\s+([\s\S]*)\s+GSTN'
+  gst_code:
+    parser: static
+    value: 27
+    type: int
+  tax_amount:
+    parser: static
+    value: 0
+    type: float
+  total_amount:
+    parser: static
+    value: 0
+    type: float
+  lines:
+    parser: lines
+    start: unit\s+INR\s+
+    end: \s*Regd\s+Office
+    first_line: 
+      - (?P<line_no>^\d{1,3})\s+(?P<description>.+?)(?P<due_on>)\d{4,8}\s+(?P<quantity>[0-9,]+\.\d{2,4})\s+PCE\s+(?P<rate>[0-9,]+\.\d{2})(?P<discount>)\s+(?P<value>[0-9,]+\.\d{2})\s+
+    line: 
+      - '\s+(?P<description>.+)$'
+    types:
+      line_no: int
+      due_on: date
+      quantity: int
+      rate: float
+      discount: float
+      value: float
+options:
+  currency: INR
+  date_formats: 
+    - '%d/%b/%y'
+  languages: 
+    - en
